@@ -13,24 +13,13 @@ func Test_partOne(t *testing.T) {
 		want  int
 	}{
 		{
-			name: "Test Input",
-			lines: []string{
-				"L68",
-				"L30",
-				"R48",
-				"L5",
-				"R60",
-				"L55",
-				"L1",
-				"L99",
-				"R14",
-				"L82",
-			},
-			want: 3,
+			name:  "Test Input",
+			lines: GetTestInput(),
+			want:  3,
 		},
 		{
 			name:  "Happy Path",
-			lines: getInput(),
+			lines: GetInput(),
 			want:  1089,
 		},
 	}
@@ -50,24 +39,13 @@ func Test_partTwo(t *testing.T) {
 		want  int
 	}{
 		{
-			name: "Test Input",
-			lines: []string{
-				"L68",
-				"L30",
-				"R48",
-				"L5",
-				"R60",
-				"L55",
-				"L1",
-				"L99",
-				"R14",
-				"L82",
-			},
-			want: 6,
+			name:  "Test Input",
+			lines: GetTestInput(),
+			want:  6,
 		},
 		{
 			name:  "Happy Path",
-			lines: getInput(),
+			lines: GetInput(),
 			want:  6530,
 		},
 	}

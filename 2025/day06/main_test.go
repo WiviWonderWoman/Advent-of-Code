@@ -46,13 +46,13 @@ func Test_partTwo(t *testing.T) {
 			want:  3263827,
 		},
 		{
-			name:  "To low",
+			name:  "Too low",
 			lines: GetInput(),
 			wrong: []int{3101160432201},
 		},
 		// ! latest: 8060033472429
 		// {
-		// 	name:  "To high",
+		// 	name:  "Too high",
 		// 	lines: GetInput(),
 		// 	wrong: []int{7998609941928, 8060033472429},
 		// },
@@ -72,13 +72,13 @@ func Test_partTwo(t *testing.T) {
 			is := is.New(t)
 			got := partTwo(tt.lines)
 			if len(tt.wrong) > 0 {
-				if tt.name == "To low" {
+				if tt.name == "Too low" {
 					for _, w := range tt.wrong {
 						is.Equal(slices.Compare([]int{got}, []int{w}), 1)
 					}
 				}
 
-				if tt.name == "To high" {
+				if tt.name == "Too high" {
 					is.Equal(slices.Compare(tt.wrong, []int{got}), 1)
 				}
 

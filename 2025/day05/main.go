@@ -9,6 +9,31 @@ import (
 	"strings"
 )
 
+func GetTestInput() []string {
+	return []string{
+		"3-5",
+		"10-14",
+		"16-20",
+		"12-18",
+		"",
+		"1",
+		"5",
+		"8",
+		"11",
+		"17",
+		"32",
+	}
+}
+
+func GetInput() []string {
+	lines, err := utils.ReadInput("day05")
+	if err != nil {
+		panic(err)
+	}
+
+	return lines
+}
+
 func main() {
 	lines, err := utils.ReadInput("day05")
 	if err != nil {

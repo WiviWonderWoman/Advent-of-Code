@@ -5,7 +5,22 @@ import (
 	"fmt"
 )
 
-func getInput() []string {
+func GetTestInput() []string {
+	return []string{
+		"L68",
+		"L30",
+		"R48",
+		"L5",
+		"R60",
+		"L55",
+		"L1",
+		"L99",
+		"R14",
+		"L82",
+	}
+}
+
+func GetInput() []string {
 	lines, err := utils.ReadInput("day01")
 	if err != nil {
 		panic(err)
@@ -15,7 +30,7 @@ func getInput() []string {
 }
 
 func main() {
-	lines := getInput()
+	lines := GetInput()
 
 	fmt.Println("Day 1, Part 1 Answer:", partOne(lines))
 	fmt.Println("Day 1, Part 2 Answer:", partTwo(lines))
