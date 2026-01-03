@@ -46,21 +46,32 @@ func Test_partTwo(t *testing.T) {
 			want:  19,
 		},
 		{
+			name:  "Too low",
+			lines: GetTestInput(),
+			wrong: []int{9},
+		},
+		{
 			name:  "Too high",
 			lines: GetInput(),
-			wrong: []int{2132, 2190, 2685},
+			wrong: []int{2132, 2188, 2190, 2685},
 		},
-		// {
-		// 	name:  "check length",
-		// 	lines: GetInput(),
-		// 	want:  140,
-		// },
+		{
+			name:  "check length",
+			lines: GetInput(),
+			want:  0,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			is := is.New(t)
 			got := partTwo(tt.lines)
 			if len(tt.wrong) > 0 {
+				if tt.name == "Too low" {
+					for _, w := range tt.wrong {
+						is.Equal(slices.Compare([]int{got}, []int{w}), 1)
+					}
+				}
+
 				if tt.name == "Too high" {
 					is.Equal(slices.Compare(tt.wrong, []int{got}), 1)
 				}

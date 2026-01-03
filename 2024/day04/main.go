@@ -45,13 +45,8 @@ func partOne(lines []string) int {
 	total := 0
 
 	total += findHorizontal(lines)
-	fmt.Println("findHorizontal: ", total)
-
 	total += findVertical(lines)
-	fmt.Println("findVertical: ", total)
-
 	total += findDiagonal(lines)
-	fmt.Println("findDiagonal: ", total)
 
 	return total
 }
@@ -194,7 +189,6 @@ func findDiagonal(lines []string) int {
 					)
 					if check == word {
 						total++
-						fmt.Println("Diagonal down-left:", check)
 					}
 				}
 			}
@@ -204,19 +198,14 @@ func findDiagonal(lines []string) int {
 }
 
 func partTwo(lines []string) int {
-	total := len(lines)
+	total := 0
 
 	for row, line := range lines {
 		rows := len(lines) - 2
-		if row == 0 {
-			fmt.Println(len(lines), "rows: ", rows)
-		}
+
 		for col, char := range line {
 			columns := len(line) - 2
 
-			if row == 0 && col == 0 {
-				fmt.Println(len(line), "columns: ", columns)
-			}
 			if char == 'A' {
 				if row < 1 || row > rows || col > columns || col < 1 {
 					continue
