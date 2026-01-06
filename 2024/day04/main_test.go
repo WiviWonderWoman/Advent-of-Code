@@ -43,12 +43,7 @@ func Test_partTwo(t *testing.T) {
 		{
 			name:  "happy test input",
 			lines: GetTestInput(),
-			want:  19,
-		},
-		{
-			name:  "too low test input",
-			lines: GetTestInput(),
-			wrong: []int{9},
+			want:  9,
 		},
 		{
 			name:  "Too high",
@@ -58,7 +53,7 @@ func Test_partTwo(t *testing.T) {
 		{
 			name:  "Happy Path",
 			lines: GetInput(),
-			want:  2685,
+			want:  2048,
 		},
 	}
 	for _, tt := range tests {

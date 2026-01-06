@@ -225,7 +225,6 @@ func partTwo(lines []string) int {
 				if check == "MSMS" || check == "SMSM" || check == "SSMM" || check == "MMSS" {
 					total++
 				}
-
 			}
 		}
 	}
