@@ -41,7 +41,7 @@ func Test_partTwo(t *testing.T) {
 		{
 			name:  "check test input length",
 			lines: GetTestInput(),
-			want:  28,
+			want:  123,
 		},
 		{
 			name:  "check length",

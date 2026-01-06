@@ -4,6 +4,7 @@ import (
 	"adventofcode/utils"
 	"fmt"
 	"slices"
+	"strconv"
 	"strings"
 )
 
@@ -65,7 +66,7 @@ func partOne(lines []string) int {
 	updates := lines[idx:]
 
 	// find valid updates
-	valid := checkUpadates(updates, rules)
+	valid, _ := sortUpdates(updates, rules)
 
 	// add middle page-numbers together
 	for _, update := range valid {
@@ -82,39 +83,44 @@ func partOne(lines []string) int {
 	return total
 }
 
-func checkUpadates(updates, rules []string) []string {
+func sortUpdates(updates, rules []string) ([]string, []string) {
 	valid := []string{}
+	invalid := []string{}
 
 	for _, update := range updates {
 		pages := strings.Split(update, ",")
 		ok := true
-		current := ""
-		var before []string
-		var after []string
 
-		for i := range pages {
-			current = pages[i]
+		for i, current := range pages {
 			if current == "" {
 				continue
 			}
 
-			before = pages[:i]
-			after = pages[i+1:]
+			before := pages[:i]
+			after := pages[i+1:]
 
 			ok = checkRules(rules, current, before, after)
 			if !ok {
 				break
 			}
+
 		}
 
 		if !ok {
-			continue
+			if !slices.Contains(invalid, update) {
+				invalid = append(invalid, update)
+			}
 		}
 
-		valid = append(valid, update)
+		if ok {
+			if !slices.Contains(valid, update) {
+				valid = append(valid, update)
+			}
+		}
+
 	}
 
-	return valid
+	return valid, invalid
 }
 
 func checkRules(rules []string, page string, before, after []string) bool {
@@ -142,6 +148,62 @@ func checkRules(rules []string, page string, before, after []string) bool {
 
 func partTwo(lines []string) int {
 	total := len(lines)
+	idx := slices.Index(lines, "")
+	rules := lines[0:idx]
+	slices.Sort(rules)
+
+	updates := lines[idx:]
+
+	// find invalid updates
+	_, invalid := sortUpdates(updates, rules)
+	fmt.Println("invalid: ", len(invalid))
+
+	// get sorted Rule map
+	ruleMap := make(map[string]Rule)
+	for _, rule := range rules {
+		r := getStructuredRule(rule, rules)
+		ruleMap[strconv.Itoa(r.value)] = r
+	}
+	// fmt.Println("ruleMap: ", ruleMap)
 
 	return total
+}
+
+type Rule struct {
+	value       int
+	comesBefore []int
+	comesAfter  []int
+}
+
+func getStructuredRule(input string, rules []string) Rule {
+	inputParts := strings.Split(input, "|")
+	structured := Rule{
+		value:       utils.StringToInt(inputParts[0]),
+		comesBefore: []int{utils.StringToInt(inputParts[1])},
+		comesAfter:  []int{},
+	}
+
+	for _, rule := range rules {
+		if rule == input {
+			continue
+		}
+
+		if strings.Contains(rule, inputParts[0]) {
+			ruleParts := strings.Split(rule, "|")
+			if ruleParts[0] == inputParts[0] {
+				// comesBefore append [1]
+				structured.comesBefore = append(structured.comesBefore, utils.StringToInt(ruleParts[1]))
+			}
+
+			if ruleParts[1] == inputParts[0] {
+				// comesAfter append [0]
+				structured.comesAfter = append(structured.comesAfter, utils.StringToInt(ruleParts[0]))
+			}
+		}
+	}
+
+	slices.Sort(structured.comesAfter)
+	slices.Sort(structured.comesBefore)
+
+	return structured
 }
