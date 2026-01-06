@@ -1,7 +1,7 @@
 package main
 
 import (
-	"adventofcode2025/utils"
+	"adventofcode/utils"
 	"cmp"
 	"fmt"
 	"math"
