@@ -3,6 +3,7 @@ package main
 import (
 	"adventofcode/utils"
 	"fmt"
+	"slices"
 	"strings"
 )
 
@@ -38,7 +39,6 @@ func partOne(lines []string) int {
 	total := 0
 
 	reports := getParsedReports(lines)
-	fmt.Println(reports)
 
 	for _, report := range reports {
 		ok := checkReport(report)
@@ -121,10 +121,90 @@ func checkDecreasing(report []int) bool {
 }
 
 func partTwo(lines []string) int {
-	total := len(lines)
+	total := 0
 
 	reports := getParsedReports(lines)
-	fmt.Println(reports)
+
+	for _, report := range reports {
+		ok := checkReportPartTwo(report)
+		if ok {
+			total++
+		}
+	}
 
 	return total
+}
+
+func checkReportPartTwo(report []int) bool {
+	safe := true
+	increasing := slices.IsSorted(report)
+
+	switch increasing {
+	case true:
+		safe = checkIncreasing(report)
+		if !safe {
+			safe = checkEveryLevel(report, 0)
+		}
+	case false:
+		safe = checkDecreasing(report)
+		if !safe {
+			safe = checkEveryLevel(report, 0)
+		}
+	}
+
+	return safe
+}
+
+func checkEveryLevel(report []int, index int) bool {
+	output := []int{}
+	fixed := false
+
+	increasing := slices.IsSorted(report)
+	for i := index; i < len(report); i++ {
+		level := report[i]
+		if i != 0 {
+			if !fixed && slices.Contains(output, level) {
+				fixed = true
+				index = i
+				continue
+			}
+
+			switch increasing {
+			case true:
+				if !fixed && level-report[i-1] > 3 || level-report[i-1] < 1 {
+					fixed = true
+					continue
+				}
+
+			case false:
+				if !fixed && level > report[i-1] || report[i-1]-level > 3 || report[i-1]-level < 1 {
+					fixed = true
+					continue
+				}
+
+			}
+		}
+
+		output = append(output, level)
+	}
+
+	increasing = slices.IsSorted(output)
+
+	safe := false
+	switch increasing {
+	case true:
+		safe = checkIncreasing(output)
+	case false:
+		safe = checkDecreasing(output)
+	}
+
+	if index != len(report)-1 {
+		return safe
+	}
+
+	if !safe {
+		safe = checkEveryLevel(report, index)
+	}
+
+	return safe
 }
