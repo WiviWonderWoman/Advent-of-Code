@@ -50,22 +50,21 @@ func Test_partTwo(t *testing.T) {
 			lines: GetInput(),
 			wrong: []int{3101160432201},
 		},
-		// ! latest: 8060033472429
-		// {
-		// 	name:  "Too high",
-		// 	lines: GetInput(),
-		// 	wrong: []int{7998609941928, 8060033472429},
-		// },
+		{
+			name:  "Too high",
+			lines: GetInput(),
+			wrong: []int{7998609941928, 8060033472429},
+		},
 		{
 			name:  "Wrong",
 			lines: GetInput(),
 			wrong: []int{79962213186450},
 		},
-		// {
-		// 	name:  "Happy Path",
-		// 	lines: GetInput(),
-		// 	want:  0,
-		// },
+		{
+			name:  "Happy Path",
+			lines: GetInput(),
+			want:  0,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -79,7 +78,9 @@ func Test_partTwo(t *testing.T) {
 				}
 
 				if tt.name == "Too high" {
-					is.Equal(slices.Compare(tt.wrong, []int{got}), 1)
+					for _, w := range tt.wrong {
+						is.Equal(slices.Compare([]int{w}, []int{got}), 1)
+					}
 				}
 
 				is.True(!slices.Contains(tt.wrong, got))

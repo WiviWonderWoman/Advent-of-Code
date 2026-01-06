@@ -13,12 +13,12 @@ func Test_partOne(t *testing.T) {
 		want  int
 	}{
 		{
-			name:  "check test input length",
+			name:  "happy test input",
 			lines: GetTestInput(),
 			want:  41,
 		},
 		{
-			name:  "check length",
+			name:  "Happy Path",
 			lines: GetInput(),
 			want:  5531,
 		},

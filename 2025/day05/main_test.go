@@ -41,7 +41,7 @@ func Test_partTwo(t *testing.T) {
 		wrong []int
 	}{
 		{
-			name:  "Happy Path Test",
+			name:  "happy test input",
 			lines: GetTestInput(),
 			want:  14,
 		},
@@ -67,8 +67,11 @@ func Test_partTwo(t *testing.T) {
 			got := partTwo(tt.lines)
 			if len(tt.wrong) > 0 {
 				if tt.name == "Too high" {
-					is.Equal(slices.Compare(tt.wrong, []int{got}), 1)
+					for _, w := range tt.wrong {
+						is.Equal(slices.Compare([]int{w}, []int{got}), 1)
+					}
 				}
+
 				is.True(!slices.Contains(tt.wrong, got))
 				return
 			}

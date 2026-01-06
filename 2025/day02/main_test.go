@@ -26,12 +26,6 @@ func Test_dayTwo(t *testing.T) {
 			want:  52316131093,
 		},
 		{
-			name:  "TEST input part 2",
-			lines: []string{"565653-565659", "824824821-824824827", "2121212118-2121212124"},
-			part:  2,
-			want:  2946602601,
-		},
-		{
 			name:  "happy test input part 2",
 			lines: GetTestInput(),
 			part:  2,

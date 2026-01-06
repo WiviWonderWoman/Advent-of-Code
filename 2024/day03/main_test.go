@@ -38,7 +38,6 @@ func Test_partTwo(t *testing.T) {
 		lines string
 		want  int
 	}{
-		// FIXME: test input should be: 48
 		{
 			name:  "check test input length",
 			lines: GetTestInput(),

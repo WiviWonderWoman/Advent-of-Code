@@ -11,7 +11,6 @@ func Test_partOne(t *testing.T) {
 	tests := []struct {
 		name  string
 		lines []string
-		wrong []int
 		want  int
 	}{
 		{
@@ -29,14 +28,6 @@ func Test_partOne(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			is := is.New(t)
 			got := partOne(tt.lines)
-			if len(tt.wrong) > 0 {
-				if tt.name == "To high" {
-					is.Equal(slices.Compare(tt.wrong, []int{got}), 1)
-				}
-				is.True(!slices.Contains(tt.wrong, got))
-				return
-			}
-
 			is.Equal(got, tt.want)
 		})
 	}

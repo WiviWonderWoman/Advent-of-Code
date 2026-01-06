@@ -21,18 +21,18 @@ func Test_partOne(t *testing.T) {
 			laps:  11,
 			want:  40,
 		},
-		// {
-		// 	name:  "Too low",
-		// 	lines: GetInput(),
-		// 	laps:  1000,
-		// 	wrong: []int{252, 16896},
-		// },
-		// {
-		// 	name:  "Happy path",
-		// 	lines: GetInput(),
-		// 	laps:  1000,
-		// 	want:  0,
-		// },
+		{
+			name:  "Too low",
+			lines: GetInput(),
+			laps:  1000,
+			wrong: []int{252, 16896},
+		},
+		{
+			name:  "Happy path",
+			lines: GetInput(),
+			laps:  1000,
+			want:  0,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -44,6 +44,13 @@ func Test_partOne(t *testing.T) {
 						is.Equal(slices.Compare([]int{got}, []int{w}), 1)
 					}
 				}
+
+				if tt.name == "Too high" {
+					for _, w := range tt.wrong {
+						is.Equal(slices.Compare([]int{w}, []int{got}), 1)
+					}
+				}
+
 				is.True(!slices.Contains(tt.wrong, got))
 				return
 			}
@@ -59,7 +66,16 @@ func Test_partTwo(t *testing.T) {
 		lines []string
 		want  int
 	}{
-		// TODO: Add test cases.
+		{
+			name:  "check test input length",
+			lines: GetTestInput(),
+			want:  20,
+		},
+		{
+			name:  "check length",
+			lines: GetInput(),
+			want:  1000,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

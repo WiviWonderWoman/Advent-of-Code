@@ -19,11 +19,11 @@ func Test_partOne(t *testing.T) {
 			lines: GetTestInput(),
 			want:  12,
 		},
-		// {
-		// 	name:  "Too high",
-		// 	lines: GetInput(),
-		// 	wrong: []int{219,386},
-		// },
+		{
+			name:  "Too high",
+			lines: GetInput(),
+			wrong: []int{219, 386},
+		},
 		{
 			name:  "check length",
 			lines: GetInput(),

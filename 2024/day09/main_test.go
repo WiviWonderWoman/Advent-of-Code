@@ -19,11 +19,11 @@ func Test_partOne(t *testing.T) {
 			line: GetTestInput(),
 			want: 1928,
 		},
-		// {
-		// 	name:  "Too low",
-		// 	line:  GetInput(),
-		// 	wrong: []int{90165373410},
-		// },
+		{
+			name:  "Too low",
+			line:  GetInput(),
+			wrong: []int{90165373410},
+		},
 		// {
 		// 	name: "check length",
 		// 	line: GetInput(),
@@ -61,16 +61,16 @@ func Test_partTwo(t *testing.T) {
 		line string
 		want int
 	}{
-		// {
-		// 	name: "check test input length",
-		// 	line: GetTestInput(),
-		// 	want: 19,
-		// },
-		// {
-		// 	name: "check length",
-		// 	line: GetInput(),
-		// 	want: 19999,
-		// },
+		{
+			name: "check test input length",
+			line: GetTestInput(),
+			want: 19,
+		},
+		{
+			name: "check length",
+			line: GetInput(),
+			want: 19999,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

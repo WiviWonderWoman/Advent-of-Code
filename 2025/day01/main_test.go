@@ -8,12 +8,12 @@ import (
 
 func Test_partOne(t *testing.T) {
 	tests := []struct {
-		name  string // description of this test case
+		name  string
 		lines []string
 		want  int
 	}{
 		{
-			name:  "Test Input",
+			name:  "happy test input",
 			lines: GetTestInput(),
 			want:  3,
 		},
@@ -34,12 +34,12 @@ func Test_partOne(t *testing.T) {
 
 func Test_partTwo(t *testing.T) {
 	tests := []struct {
-		name  string // description of this test case
+		name  string
 		lines []string
 		want  int
 	}{
 		{
-			name:  "Test Input",
+			name:  "happy test input",
 			lines: GetTestInput(),
 			want:  6,
 		},

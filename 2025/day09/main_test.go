@@ -45,6 +45,7 @@ func Test_partTwo(t *testing.T) {
 			lines: GetTestInput(),
 			want:  24,
 		},
+		// ! times out after 2m
 		// {
 		// 	name:  "Too low",
 		// 	lines: GetInput(),
@@ -66,6 +67,13 @@ func Test_partTwo(t *testing.T) {
 						is.Equal(slices.Compare([]int{got}, []int{w}), 1)
 					}
 				}
+
+				if tt.name == "Too high" {
+					for _, w := range tt.wrong {
+						is.Equal(slices.Compare([]int{w}, []int{got}), 1)
+					}
+				}
+
 				is.True(!slices.Contains(tt.wrong, got))
 				return
 			}
