@@ -45,138 +45,205 @@ func GetInput() []string {
 }
 
 func main() {
-	// lines:=GetInput()
-	lines := GetTestInput()
+	lines := GetInput()
 
 	fmt.Println("Day 08, Part 1 Answer: ", partOne(lines, 1000))
 	fmt.Println("Day 08, Part 2 Answer: ", partTwo(lines))
 }
 
-type EuclideanPoint []float64
+// Point3D representerar en punkt i 3D-rymd (x, y, z)
+type Point3D []float64
 
-type Box struct {
-	Str            string
-	Idx            int
-	EuclideanPoint EuclideanPoint
+// JunctionBox representerar en elektrisk kopplingsbox med position i 3D
+type JunctionBox struct {
+	OriginalLine string  // Ursprungliga raden från input
+	Index        int     // Index i listan (0, 1, 2, ...)
+	Position     Point3D // 3D-koordinater
 }
 
-func (ep EuclideanPoint) EuclideanDistance(p EuclideanPoint) float64 {
-	var total float64 = 0
+// DistanceTo beräknar det euklidiska avståndet mellan två punkter i 3D
+// Formeln är: sqrt((x1-x2)² + (y1-y2)² + (z1-z2)²)
+func (p Point3D) DistanceTo(other Point3D) float64 {
+	sumOfSquares := 0.0
 
-	for i, x_i := range ep {
-		// using Abs since the value could be negative but we require the magnitude
-		diff := math.Abs(x_i - p[i])
-		total += diff * diff
+	for i := range p {
+		diff := p[i] - other[i]
+		sumOfSquares += diff * diff
 	}
 
-	return math.Sqrt(total)
+	return math.Sqrt(sumOfSquares)
 }
 
-func partOne(lines []string, laps int) int {
-	total := 0
-	boxes := getBoxes(lines)
-	min := float64(0)
+// Connection representerar en möjlig koppling mellan två junction boxes
+type Connection struct {
+	BoxA     int     // Index för första boxen
+	BoxB     int     // Index för andra boxen
+	Distance float64 // Avståndet mellan dem
+}
 
-	connections := [][]int{}
-	var connection []int
+func partOne(lines []string, numberOfConnectionsToMake int) int {
+	// Steg 1: Parsa input till junction boxes
+	junctionBoxes := parseJunctionBoxes(lines)
 
-	idx := 0
-	for idx <= laps {
-		min, connection = getMinAndConnection(boxes, min)
-		connection = slices.Compact(connection)
-		connections = append(connections, connection)
-		idx = len(connections)
+	// Steg 2: Beräkna alla möjliga kopplingar mellan alla par av boxes
+	// Om vi har 1000 boxes finns det 1000*999/2 = ~500,000 möjliga kopplingar
+	allPossibleConnections := calculateAllConnections(junctionBoxes)
 
-	}
-
-	newConnections := [][]int{}
-	for i, c := range connections {
-		if i == 0 {
-			newConnections = checkConnections(c, connections)
-		}
-		checkConnections(c, newConnections)
-	}
-	connections = newConnections
-
-	slices.SortFunc(connections, func(a, b []int) int {
-		return cmp.Compare(len(b), len(a))
+	// Steg 3: Sortera kopplingarna efter avstånd (kortast först)
+	slices.SortFunc(allPossibleConnections, func(a, b Connection) int {
+		return cmp.Compare(a.Distance, b.Distance)
 	})
 
-	total = len(connections[0]) * len(connections[1]) * len(connections[2])
+	// Steg 4: Använd Union-Find för att spåra vilka boxes som tillhör samma krets
+	//
+	// Union-Find är en datastruktur som effektivt håller koll på grupper/mängder.
+	// - find(x): Hitta vilken grupp box x tillhör (returnerar "root" för gruppen)
+	// - union(x, y): Slå ihop grupperna som x och y tillhör till en grupp
+	//
+	// Exempel: Om box 1 och 3 är i samma krets, och vi gör union(1, 5),
+	// då blir box 1, 3 och 5 alla i samma krets.
 
-	return total
+	circuitTracker := newUnionFind(len(junctionBoxes))
+
+	// Steg 5: Gör de N kortaste kopplingarna
+	// (Uppgiften säger 1000 kopplingar för riktiga input)
+	for i := 0; i < numberOfConnectionsToMake && i < len(allPossibleConnections); i++ {
+		connection := allPossibleConnections[i]
+		// Koppla ihop de två boxarna - de blir nu del av samma krets
+		circuitTracker.union(connection.BoxA, connection.BoxB)
+	}
+
+	// Steg 6: Räkna hur stora de olika kretsarna är
+	circuitSizes := circuitTracker.getGroupSizes()
+
+	// Steg 7: Sortera storlekarna (störst först)
+	slices.Sort(circuitSizes)
+	slices.Reverse(circuitSizes)
+
+	// Steg 8: Multiplicera de tre största kretsarnas storlekar
+	result := 1
+	for i := 0; i < 3 && i < len(circuitSizes); i++ {
+		result *= circuitSizes[i]
+	}
+
+	return result
 }
 
-func checkConnections(comp []int, connections [][]int) [][]int {
-	newConnections := connections
+// calculateAllConnections beräknar avståndet mellan alla par av junction boxes
+func calculateAllConnections(boxes []JunctionBox) []Connection {
+	connections := []Connection{}
 
-	for i, con := range connections {
-		newCon := con
-		if slices.Contains(con, comp[0]) && slices.Contains(con, comp[1]) {
-			// fmt.Println("BOTH comp: ", comp, " con: ", con)
-			return newConnections
-		} else if slices.Contains(con, comp[0]) && !slices.Contains(con, comp[1]) {
-			// fmt.Println("FIRST comp: ", comp, " con: ", con)
-			newConnections[i] = append(newCon, comp[1])
-			return newConnections
-		} else if slices.Contains(con, comp[1]) && !slices.Contains(con, comp[0]) {
-			// fmt.Println("LAST comp: ", comp, " con: ", con)
-			newConnections[i] = append(newCon, comp[0])
-			return newConnections
+	// Loopa genom alla unika par (i, j) där i < j
+	// Detta undviker dubbletter (vi vill inte ha både (1,2) och (2,1))
+	for i := 0; i < len(boxes); i++ {
+		for j := i + 1; j < len(boxes); j++ {
+			distance := boxes[i].Position.DistanceTo(boxes[j].Position)
+			connections = append(connections, Connection{
+				BoxA:     i,
+				BoxB:     j,
+				Distance: distance,
+			})
 		}
 	}
 
-	return newConnections
+	return connections
 }
 
-func getMinAndConnection(boxes []Box, limit float64) (float64, []int) {
-	min := float64(0)
+// UnionFind är en datastruktur för att spåra vilka element som tillhör samma grupp
+type UnionFind struct {
+	// parent[i] = föräldern till element i
+	// Om parent[i] == i, då är i "root" (ledaren) för sin grupp
+	parent []int
 
-	connection := []int{}
-	for _, box := range boxes {
-		current, con := compareBoxes(box, boxes, min, limit)
-		if min == 0 || current < min {
-			min = current
-			connection = con
-		}
+	// rank[i] = ungefärlig djup av trädet under i
+	// Används för att hålla träden balanserade (optimering)
+	rank []int
+}
+
+// newUnionFind skapar en ny Union-Find struktur där varje element startar i sin egen grupp
+func newUnionFind(size int) *UnionFind {
+	parent := make([]int, size)
+	rank := make([]int, size)
+
+	// I början är varje element sin egen förälder (sin egen grupp)
+	for i := range parent {
+		parent[i] = i
 	}
 
-	return min, connection
+	return &UnionFind{parent: parent, rank: rank}
 }
 
-func compareBoxes(comp Box, boxes []Box, min float64, limit float64) (float64, []int) {
-	low := min
-	connection := []int{}
-	for _, box := range boxes {
-		if box.Idx == comp.Idx {
-			continue
-		}
-
-		current := comp.EuclideanPoint.EuclideanDistance(box.EuclideanPoint)
-
-		if low == 0 || current < low && current > limit {
-			low = current
-			connection = []int{box.Idx, comp.Idx}
-		}
+// find hittar "root" (ledaren) för gruppen som element x tillhör
+// Använder "path compression" - alla element längs vägen pekar direkt på root efteråt
+func (uf *UnionFind) find(x int) int {
+	if uf.parent[x] != x {
+		// Rekursivt hitta root och uppdatera parent för snabbare framtida lookups
+		uf.parent[x] = uf.find(uf.parent[x])
 	}
-	slices.Sort(connection)
-	return low, connection
+	return uf.parent[x]
 }
 
-func getBoxes(lines []string) []Box {
-	boxes := []Box{}
+// union slår ihop grupperna som x och y tillhör
+func (uf *UnionFind) union(x, y int) {
+	rootX := uf.find(x)
+	rootY := uf.find(y)
+
+	// Om de redan är i samma grupp, gör inget
+	if rootX == rootY {
+		return
+	}
+
+	// Slå ihop grupperna - häng det mindre trädet under det större
+	// Detta håller träden balanserade för snabbare find()
+	if uf.rank[rootX] < uf.rank[rootY] {
+		uf.parent[rootX] = rootY
+	} else if uf.rank[rootX] > uf.rank[rootY] {
+		uf.parent[rootY] = rootX
+	} else {
+		uf.parent[rootY] = rootX
+		uf.rank[rootX]++
+	}
+}
+
+// getGroupSizes returnerar en lista med storleken på varje grupp
+func (uf *UnionFind) getGroupSizes() []int {
+	// Räkna hur många element som har varje root
+	sizeByRoot := make(map[int]int)
+
+	for i := range uf.parent {
+		root := uf.find(i)
+		sizeByRoot[root]++
+	}
+
+	// Konvertera map till lista
+	sizes := []int{}
+	for _, size := range sizeByRoot {
+		sizes = append(sizes, size)
+	}
+
+	return sizes
+}
+
+// parseJunctionBoxes konverterar input-rader till JunctionBox-strukturer
+func parseJunctionBoxes(lines []string) []JunctionBox {
+	boxes := []JunctionBox{}
+
 	for i, line := range lines {
-		ep := EuclideanPoint{}
-		box := Box{Str: line, Idx: i}
+		// Splitta "162,817,812" till ["162", "817", "812"]
+		coordinates := strings.Split(line, ",")
 
-		splitted := strings.Split(line, ",")
-		for _, str := range splitted {
-			number, _ := strconv.ParseFloat(str, 64)
-			ep = append(ep, number)
+		// Konvertera strängar till float64
+		position := Point3D{}
+		for _, coord := range coordinates {
+			number, _ := strconv.ParseFloat(coord, 64)
+			position = append(position, number)
 		}
 
-		box.EuclideanPoint = ep
-		boxes = append(boxes, box)
+		boxes = append(boxes, JunctionBox{
+			OriginalLine: line,
+			Index:        i,
+			Position:     position,
+		})
 	}
 
 	return boxes
@@ -184,6 +251,5 @@ func getBoxes(lines []string) []Box {
 
 func partTwo(lines []string) int {
 	total := len(lines)
-
 	return total
 }

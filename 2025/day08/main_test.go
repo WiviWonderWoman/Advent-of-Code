@@ -1,59 +1,37 @@
 package main
 
 import (
-	"slices"
 	"testing"
 
 	"github.com/matryer/is"
 )
 
 func Test_partOne(t *testing.T) {
+	lines := GetInput()
 	tests := []struct {
-		name  string
-		lines []string
-		laps  int
-		wrong []int
-		want  int
+		name    string
+		lines   []string
+		mutiply int
+		wrong   []int
+		want    int
 	}{
 		{
-			name:  "Test input",
-			lines: GetTestInput(),
-			laps:  11,
-			want:  40,
+			name:    "Test input",
+			lines:   GetTestInput(),
+			mutiply: 10,
+			want:    40,
 		},
 		{
-			name:  "Too low",
-			lines: GetInput(),
-			laps:  1000,
-			wrong: []int{252, 16896},
-		},
-		{
-			name:  "Happy path",
-			lines: GetInput(),
-			laps:  1000,
-			want:  0,
+			name:    "Happy path",
+			lines:   lines,
+			mutiply: 1000,
+			want:    129564,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			is := is.New(t)
-			got := partOne(tt.lines, tt.laps)
-			if len(tt.wrong) > 0 {
-				if tt.name == "Too low" {
-					for _, w := range tt.wrong {
-						is.Equal(slices.Compare([]int{got}, []int{w}), 1)
-					}
-				}
-
-				if tt.name == "Too high" {
-					for _, w := range tt.wrong {
-						is.Equal(slices.Compare([]int{w}, []int{got}), 1)
-					}
-				}
-
-				is.True(!slices.Contains(tt.wrong, got))
-				return
-			}
+			got := partOne(tt.lines, tt.mutiply)
 
 			is.Equal(got, tt.want)
 		})
