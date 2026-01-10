@@ -3,7 +3,8 @@ package main
 import (
 	"adventofcode/utils"
 	"fmt"
-	"slices"
+	"math"
+	"math/bits"
 	"strings"
 )
 
@@ -31,8 +32,7 @@ func GetInput() []string {
 }
 
 func main() {
-	// lines:=GetInput()
-	lines := GetTestInput()
+	lines := GetInput()
 
 	fmt.Println("Day 07, Part 1 Answer: ", partOne(lines))
 	fmt.Println("Day 07, Part 2 Answer: ", partTwo(lines))
@@ -43,101 +43,76 @@ type Equation struct {
 	numbers []int
 }
 
+// NOT pretty bur it works
 func partOne(lines []string) int {
 	total := 0
 
 	equations := getEquations(lines)
 
 	for _, equation := range equations {
-		numbers := equation.numbers
-		if len(numbers) == 1 {
-			fmt.Println(numbers)
-		}
 		// add
-		addAll := utils.AddNumbers(numbers)
+		addAll := utils.AddNumbers(equation.numbers)
 		// multiply
-		multipyAll := utils.MultiplyNumbers(numbers)
+		multipyAll := utils.MultiplyNumbers(equation.numbers)
 
 		if addAll == equation.answer || multipyAll == equation.answer {
-			fmt.Println("CORRECT:", equation)
+			fmt.Println("SAME CORRECT:", equation)
 			total += equation.answer
 			continue
 		}
 
-		sum := 0
-		if len(numbers) > 2 {
-			indencies := make([]int, 0, len(numbers))
-			for i := range numbers {
-				indencies = []int{i}
+		if len(equation.numbers) > 2 {
+			// possible combinations
+			possibilities := int(math.Pow(2, float64(len(equation.numbers)-1))) - 1
 
-				methods := getMethods(numbers, indencies)
+			// initial value
+			current := equation.numbers[0]
 
-				current := calculateProblem(methods, numbers)
+			binaryArr := make([]string, 0, possibilities)
+			for possible := range possibilities {
+				// binary representation of number
+				binaryStr := fmt.Sprintf("%.16b", possible)
 
-				if current == equation.answer {
-					fmt.Println("CORRECT:", equation)
-					sum = equation.answer
-					break
+				// cut excessive leading zeros
+				if len(binaryStr) > len(equation.numbers)-1 {
+					rm := bits.LeadingZeros16(uint16(possibilities))
+					binaryStr = strings.Join(strings.Split(binaryStr, "")[rm:], "")
 				}
+
+				binaryArr = append(binaryArr, binaryStr)
 			}
 
-			if sum != 0 {
-				total += sum
+			for _, binaryStr := range binaryArr {
+				for j, char := range binaryStr {
+					switch string(char) {
+					case "0":
+						// if "0" add
+						current = current + equation.numbers[j+1]
+					case "1":
+						// if "*" multiply
+						current = current * equation.numbers[j+1]
+					}
+				}
+
+				// YAY! stop this nonsense
+				if current == equation.answer {
+					break
+				}
+
+				// reset
+				current = equation.numbers[0]
+			}
+
+			if current == equation.answer {
+				fmt.Println("CORRECT:", equation)
+				total += equation.answer
 				continue
 			}
 		}
-
 	}
 
 	return total
 }
-
-func calculateProblem(methods []string, numbers []int) int {
-	current := numbers[0]
-	for i, method := range methods {
-		if method == "*" {
-			current = current * numbers[i+1]
-		}
-
-		if method == "+" {
-			current = current + numbers[i+1]
-		}
-	}
-
-	return current
-}
-
-func getMethods(numbers []int, idx []int) []string {
-	problem := make([]string, 0, len(numbers)-1)
-	for i := range numbers {
-		if i == len(numbers)-1 {
-			break
-		}
-		if slices.Contains(idx, i) { // i == idx {
-			problem = append(problem, "*")
-		} else {
-			problem = append(problem, "+")
-		}
-	}
-
-	return problem
-}
-
-// func getMethods(numbers []int, idx int) []string {
-// 	problem := make([]string, 0, len(numbers)-1)
-// 	for i := range numbers {
-// 		if i == len(numbers)-1 {
-// 			break
-// 		}
-// 		if i == idx {
-// 			problem = append(problem, "*")
-// 		} else {
-// 			problem = append(problem, "+")
-// 		}
-// 	}
-
-// 	return problem
-// }
 
 func getEquations(lines []string) []Equation {
 	equations := make([]Equation, 0, len(lines))
