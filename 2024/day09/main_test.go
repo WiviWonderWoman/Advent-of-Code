@@ -15,7 +15,7 @@ func Test_partOne(t *testing.T) {
 		want  int
 	}{
 		{
-			name: "check test input length",
+			name: "happy test input",
 			line: GetTestInput(),
 			want: 1928,
 		},

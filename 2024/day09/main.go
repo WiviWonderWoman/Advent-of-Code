@@ -33,68 +33,61 @@ func partOne(line string) int {
 	total := 0
 
 	diskMap := utils.StringToIntArr(strings.Split(line, ""))
-	// fmt.Println("diskMap: ", diskMap)
 
 	decompressed := []string{}
 	fileID := 0
-	emptySpaces := 0
+
 	for i, value := range diskMap {
 		if i%2 == 0 {
-			// even indecies are files => multiply "{index}" by the value
+			// even indecies are files => multiply "{fileID}" by the value
 			file := strings.Repeat(strconv.Itoa(fileID), value)
 			decompressed = append(decompressed, strings.Split(file, "")...)
 
 			// increase fileID
 			fileID++
 		} else {
-			// odd indecies are spaces => multply "." by the value
+			// odd indecies are spaces => multiply "." by the value
 			space := strings.Repeat(".", value)
 			decompressed = append(decompressed, strings.Split(space, "")...)
-
-			// keep track of empty spaces
-			emptySpaces += value
 		}
 	}
 
-	// fmt.Println("emptySpaces: ", emptySpaces)
-	// fmt.Println("decompressed: ", decompressed)
-
-	// repeat * len(decompressed)
-	for i := 0; i < len(decompressed); i++ {
-
-		// find index first "."
-		idx := slices.Index(decompressed, ".")
-
-		// "pop" last
-		popped, remaining := decompressed[len(decompressed)-1], decompressed[:len(decompressed)-1]
-		// skip free space
-		if popped == "." {
-			fmt.Println(i, "EMPTY END")
-
-			decompressed = remaining
-			continue
-		}
-
-		// insert/replace "poped" into index
-		decompressed = append(remaining[:idx], append([]string{popped}, remaining[idx+1:]...)...)
-
-		// break if we are done
-		if !slices.Contains(decompressed, ".") {
-			fmt.Println("BREAK")
-			break
-		}
-
-	}
-
-	compacted := utils.StringToIntArr(decompressed)
+	compacted := utils.StringToIntArr(compactFiles(decompressed))
 
 	// loop thru compacted and add: {index * value} to total
 	for i, value := range compacted {
-		res := i * value
-		total += res
+		total += i * value
 	}
 
 	return total
+}
+
+func compactFiles(input []string) []string {
+	output := input
+
+	for i := 0; i < len(output); i++ {
+		// find index first "."
+		idx := slices.Index(output, ".")
+
+		// "pop" last
+		popped, remaining := output[len(output)-1], output[:len(output)-1]
+		// skip free space
+		if popped == "." {
+			output = remaining
+			continue
+		}
+
+		// insert/replace "." with number
+		output = append(remaining[:idx], append([]string{popped}, remaining[idx+1:]...)...)
+
+		// break if we are done
+		if !slices.Contains(output, ".") {
+			return output
+		}
+
+	}
+
+	return output
 }
 
 func partTwo(line string) int {
