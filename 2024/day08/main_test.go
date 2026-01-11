@@ -15,19 +15,24 @@ func Test_partOne(t *testing.T) {
 		want  int
 	}{
 		{
-			name:  "check test input length",
+			name:  "happy test input",
 			lines: GetTestInput(),
-			want:  12,
+			want:  14,
+		},
+		{
+			name:  "Too Low",
+			lines: GetInput(),
+			wrong: []int{219},
 		},
 		{
 			name:  "Too high",
 			lines: GetInput(),
-			wrong: []int{219, 386},
+			wrong: []int{386},
 		},
 		{
 			name:  "check length",
 			lines: GetInput(),
-			want:  50,
+			want:  320,
 		},
 	}
 	for _, tt := range tests {
