@@ -48,21 +48,6 @@ type Position struct {
 	col int
 }
 
-/*
-......#....# 0,6 + //* 0,11
-...#....0... //* 1,3
-....#0....#. 2,10 + //* 2,4
-..#....0.... //* 3,2
-....0....#.. //* 4,9
-.#....A..... 5,1 + //* 5,6
-...#........ 6,3
-#......#.... 7,0 + 7,7
-........A...
-.........A..
-..........#. 10,10
-..........#. //* 11,10
-*/
-
 func partOne(lines []string) int {
 	total := 0
 
@@ -76,7 +61,6 @@ func partOne(lines []string) int {
 			}
 		}
 	}
-	fmt.Println(antennaMap)
 
 	maxRow := len(lines)
 	maxCol := len(lines[0])
@@ -142,34 +126,6 @@ func compareAntennas(idx int, frequencies []Position, maxRow, maxCol int) []Posi
 	return found
 }
 
-/*
-......#....# 0,6 + //* 0,11
-...#....0... //* 1,3
-....#0....#. 2,10 + //* 2,4
-..#....0.... //* 3,2
-....0....#.. //* 4,9
-.#....A..... 5,1 + //* 5,6
-...#........ 6,3
-#......#.... 7,0 + 7,7
-........A...
-.........A..
-..........#. 10,10
-..........#. //* 11,10
-*/
-/*
-##....#....# 0,0 + 0,1 + 0,6 + 0,11
-.#.#....0... 1,1 + 1,3
-..#.#0....#. 2,2 + 2,4 + 2,10
-..##...0.... 3,2 + 3,3
-....0....#.. 4,9
-.#...#A....# 5,1 + 5,5 + 5,6 + 5,11
-...#..#..... 6,3 + 6,6
-#....#.#.... 7,0 + 7,5 + 7,7
-..#.....A... 8,2
-....#....A.. 9,4
-.#........#.
-...#......##
-*/
 func partTwo(lines []string) int {
 	total := 0
 	antennaMap := make(map[string][]Position)
@@ -182,12 +138,9 @@ func partTwo(lines []string) int {
 			}
 		}
 	}
-	// fmt.Println(antennaMap)
 
 	maxRow := len(lines) - 1
 	maxCol := len(lines[0]) - 1
-	fmt.Println("maxRow: ", maxRow)
-	fmt.Println("maxCol: ", maxCol)
 
 	all := mapset.NewSet[Position]()
 	for _, frequencies := range antennaMap {
@@ -208,8 +161,6 @@ func partTwo(lines []string) int {
 	}
 
 	total += all.Cardinality()
-	fmt.Println("all: ", all)
-	fmt.Println("total: ", total)
 
 	return total
 }
@@ -217,7 +168,7 @@ func partTwo(lines []string) int {
 func compareAntennasPartTwo(idx int, frequencies []Position, maxRow, maxCol int) []Position {
 	compare := frequencies[idx]
 	found := make([]Position, 0, len(frequencies)*2)
-	fmt.Println("frequencies: ", frequencies)
+
 	for i := 0; i < len(frequencies); i++ {
 		if i == idx {
 			continue
@@ -240,16 +191,14 @@ func compareAntennasPartTwo(idx int, frequencies []Position, maxRow, maxCol int)
 
 func getAbovePositions(row, col, diffRow, diffCol, maxRow, maxCol int) []Position {
 	found := make([]Position, 0, row)
-	initial := Position{
-		row,
-		col,
-	}
+	initial := Position{row, col}
+
 	for range row {
 		above := Position{
 			row: initial.row - diffRow,
 			col: initial.col + diffCol,
 		}
-		fmt.Println("ABOVE: ", above)
+
 		if above.row < 0 || above.col < 0 || above.row > maxRow || above.col > maxCol {
 			break
 		}
@@ -262,19 +211,14 @@ func getAbovePositions(row, col, diffRow, diffCol, maxRow, maxCol int) []Positio
 
 func getBelowPositions(row, col, diffRow, diffCol, maxRow, maxCol int) []Position {
 	found := make([]Position, 0, maxRow-row)
+	initial := Position{row, col}
 
-	initial := Position{
-		row,
-		col,
-	}
-
-	fmt.Println("initial: ", initial)
 	for range maxRow {
 		below := Position{
 			row: initial.row + diffRow,
 			col: initial.col - diffCol,
 		}
-		fmt.Println("BELOW: ", below)
+
 		if below.row < 0 || below.col < 0 || below.row > maxRow || below.col > maxCol {
 			break
 		}
