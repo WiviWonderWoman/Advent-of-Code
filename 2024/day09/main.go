@@ -40,10 +40,10 @@ func partOne(line string) int {
 	for i, value := range diskMap {
 		if i%2 == 0 {
 			// even indecies are files => multiply "{fileID}" by the value
-			file := strings.Repeat(strconv.Itoa(fileID), value)
-			decompressed = append(decompressed, strings.Split(file, "")...)
+			for range value {
+				decompressed = append(decompressed, strconv.Itoa(fileID))
+			}
 
-			// increase fileID
 			fileID++
 		} else {
 			// odd indecies are spaces => multiply "." by the value
@@ -66,6 +66,10 @@ func compactFiles(input []string) []string {
 	output := input
 
 	for i := 0; i < len(output); i++ {
+		// break if we are done
+		if !slices.Contains(output, ".") {
+			return output
+		}
 		// find index first "."
 		idx := slices.Index(output, ".")
 
@@ -79,11 +83,6 @@ func compactFiles(input []string) []string {
 
 		// insert/replace "." with number
 		output = append(remaining[:idx], append([]string{popped}, remaining[idx+1:]...)...)
-
-		// break if we are done
-		if !slices.Contains(output, ".") {
-			return output
-		}
 
 	}
 

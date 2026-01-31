@@ -24,11 +24,11 @@ func Test_partOne(t *testing.T) {
 			line:  GetInput(),
 			wrong: []int{90165373410},
 		},
-		// {
-		// 	name: "check length",
-		// 	line: GetInput(),
-		// 	want: 19999,
-		// },
+		{
+			name: "check length",
+			line: GetInput(),
+			want: 6323641412437,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
